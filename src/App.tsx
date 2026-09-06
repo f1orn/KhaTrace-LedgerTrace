@@ -7,6 +7,8 @@ import { LiveExecutionConsole } from './components/LiveExecutionConsole';
 import { SmartContractExplorer } from './components/SmartContractExplorer';
 import { AccountAbstractionPanel } from './components/AccountAbstractionPanel';
 import { CustomScenarioModal } from './components/CustomScenarioModal';
+import { RpgCatTutorial } from './components/tutorial/RpgCatTutorial';
+import { CatCompanionWidget } from './components/tutorial/CatCompanionWidget';
 import { SCENARIOS } from './agent/scenarios';
 import { ScenarioDefinition, StateBlock, MerkleTreeNode, OnChainTxResult } from './types';
 import { LangGraphEngine } from './agent/langGraphEngine';
@@ -49,6 +51,7 @@ export function App() {
   const [activeTab, setActiveTab] = useState<'graph' | 'merkle' | 'context-drift' | 'contract' | 'session-keys' | 'live-console'>('graph');
   const [isCustomModalOpen, setIsCustomModalOpen] = useState<boolean>(false);
   const [soundEnabled, setSoundEnabled] = useState<boolean>(true);
+  const [isTutorialOpen, setIsTutorialOpen] = useState<boolean>(false);
 
   // Initialize simulation when scenario changes
   useEffect(() => {
@@ -166,6 +169,7 @@ export function App() {
         }}
         merkleRoot={merkleRoot}
         onChainTx={onChainTx}
+        onOpenTutorial={() => setIsTutorialOpen(true)}
       />
 
       {/* Main Content Area */}
@@ -201,13 +205,15 @@ export function App() {
 
         {/* Tab Views */}
         {activeTab === 'graph' && (
-          <DecisionGraph
-            stateBlocks={stateBlocks}
-            activeNodeIndex={activeNodeIndex}
-            scenario={currentScenario}
-            onSelectNode={(node) => setSelectedNode(node)}
-            selectedNode={selectedNode}
-          />
+          <div id="tutorial-decision-graph">
+            <DecisionGraph
+              stateBlocks={stateBlocks}
+              activeNodeIndex={activeNodeIndex}
+              scenario={currentScenario}
+              onSelectNode={(node) => setSelectedNode(node)}
+              selectedNode={selectedNode}
+            />
+          </div>
         )}
 
         {activeTab === 'merkle' && (
@@ -275,6 +281,21 @@ export function App() {
         onApplyScenario={(customSc) => {
           setCurrentScenario(customSc);
         }}
+      />
+
+      {/* Interactive RPG Pixel-Art Cat Guided Tour ("Inspector Whiskers") */}
+      <RpgCatTutorial
+        isOpen={isTutorialOpen}
+        onClose={() => setIsTutorialOpen(false)}
+        onTabChange={(tab) => setActiveTab(tab)}
+      />
+
+      {/* Floating Mini-Pet Cat Companion (Bottom Right) */}
+      <CatCompanionWidget
+        onOpenTutorial={() => setIsTutorialOpen(true)}
+        isRunning={isRunning}
+        onChainTx={onChainTx}
+        scenario={currentScenario}
       />
     </div>
   );

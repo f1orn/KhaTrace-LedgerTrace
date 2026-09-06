@@ -33,6 +33,7 @@ interface HeaderProps {
   onToggleSound: () => void;
   merkleRoot: string | null;
   onChainTx: OnChainTxResult | null;
+  onOpenTutorial?: () => void;
 }
 
 export const Header: React.FC<HeaderProps> = ({
@@ -46,7 +47,8 @@ export const Header: React.FC<HeaderProps> = ({
   soundEnabled,
   onToggleSound,
   merkleRoot,
-  onChainTx
+  onChainTx,
+  onOpenTutorial
 }) => {
   const sessionBudget = currentScenario?.policy?.sessionBudgetUSD ?? 50000;
   const spentAmount = onChainTx?.status === 'SUCCESS' ? (currentScenario?.initialContext?.amountUSD ?? 0) : 0;
@@ -141,7 +143,7 @@ export const Header: React.FC<HeaderProps> = ({
 
         {/* Center: Scenario Selection & Trigger Controls */}
         <div className="flex flex-wrap items-center gap-2 sm:gap-3">
-          <div className="relative">
+          <div id="tutorial-scenario-selector" className="relative">
             <select
               value={currentScenario?.id || ''}
               onChange={(e) => {
@@ -175,7 +177,23 @@ export const Header: React.FC<HeaderProps> = ({
             <span>Custom Attack / Task</span>
           </button>
 
+          {/* RPG Cat Guide Me Button */}
+          {onOpenTutorial && (
+            <button
+              onClick={() => {
+                sound.playCatMeow();
+                onOpenTutorial();
+              }}
+              className="flex items-center gap-1.5 px-3 py-2 rounded-lg bg-cyber-purple/15 hover:bg-cyber-purple/25 text-cyber-purple border border-cyber-purple/40 hover:border-cyber-purple/70 transition-all text-xs font-bold shadow-neon-purple/20"
+              title="Launch Inspector Whiskers RPG Tutorial"
+            >
+              <span className="text-sm">🐾</span>
+              <span>Guide Me!</span>
+            </button>
+          )}
+
           <button
+            id="tutorial-run-button"
             onClick={() => {
               sound.playClick();
               onRunSimulation();
@@ -205,7 +223,7 @@ export const Header: React.FC<HeaderProps> = ({
       </div>
 
       {/* Tabs Row */}
-      <div className="max-w-[1700px] mx-auto px-4 sm:px-6 flex items-center gap-1 overflow-x-auto no-scrollbar border-t border-dark-800">
+      <div id="tutorial-tabs-container" className="max-w-[1700px] mx-auto px-4 sm:px-6 flex items-center gap-1 overflow-x-auto no-scrollbar border-t border-dark-800">
         <button
           onClick={() => { sound.playClick(); onTabChange('graph'); }}
           className={`flex items-center gap-2 py-2.5 px-3.5 text-xs font-medium border-b-2 transition-all whitespace-nowrap ${
